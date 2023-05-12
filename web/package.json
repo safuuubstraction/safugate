@@ -1,0 +1,10 @@
+{
+    "name": "safugate-web",
+    "version": "1.0.0",
+    "description": "SafuGate Web App",
+    "scripts": {
+
+    },
+    "author": "oOThKOo",
+    "license": "MIT"
+}
