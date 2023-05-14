@@ -1,2 +1,0 @@
-# safugate
-The TeSaffu Project
