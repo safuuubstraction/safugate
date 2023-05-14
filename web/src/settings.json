@@ -1,3 +1,8 @@
 {
-    
+    "airstack": {
+        "apiKey": "81f3a388174e443a8f9b68616f84d8f9"
+    },
+    "etherscan": {
+        "apiKey": "4QV2MJVGWQ8PCXKSUQ1MQ24Y6MQYQ9C2BW"
+    }
 }

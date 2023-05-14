@@ -1,0 +1,138 @@
+<template>
+    <v-app class="app">
+        <v-app-bar
+            class="app-bar"
+            app
+        >
+            <a href="/">
+                <img class="logo" src="@/assets/logo-full.svg" border="0" />
+            </a>
+            <v-btn plain color="black">Team</v-btn>
+            <v-btn plain color="black">Roadmap</v-btn>
+            <v-btn plain color="black">FAQ</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn href="https://github.com/safuuubstraction" target="_blank" icon color="black">
+                <v-icon>mdi-github</v-icon>
+            </v-btn>
+            <v-btn icon color="black">
+                <v-icon>mdi-heart</v-icon>
+            </v-btn>
+            <v-btn class="connect-btn" @click="onConnectBtnClick">
+                {{ wallet }}
+            </v-btn>
+        </v-app-bar>
+        <v-main>
+            <router-view/>
+        </v-main>
+    </v-app>
+</template>
+
+<script>
+import {
+    mapStores
+} from 'pinia'
+import {
+    ethers
+} from 'ethers'
+import WalletConnectProvider from '@walletconnect/web3-provider'
+
+// modules
+import {
+    getMinifyAddress
+} from '@/modules/addresses'
+
+// stores
+import { useUserStore } from '@/stores/user'
+
+import erc20Abi from '@/abis/erc20'
+
+export default {
+    name: 'Main',
+    data: () => ({
+
+    }),
+    computed: {
+        ...mapStores(useUserStore),
+        isConnected () {
+            return this.userStore.getWallet() != null
+        },
+        wallet () {
+            const address = this.userStore.getWallet()
+            return address ? getMinifyAddress(address) : `Connect`
+        }
+    },
+    methods: {
+        async onConnectBtnClick (e) {
+            let provider = new WalletConnectProvider({
+                infuraId: '003fe999c5ab4e9e8f7d1f0ab05906ae'
+            })
+            await provider.enable()
+            if (this.isConnected) {
+                this.userStore.setUserWallet(null)
+                await provider.disconnect()
+                this.$router.push({
+                    name: 'home'
+                })
+                return
+            }
+            const web3Provider = new ethers.BrowserProvider(provider)
+            const signer = await web3Provider.getSigner()
+            const address = await signer.getAddress()
+            const chainId = await provider.request({ method: 'eth_chainId' })
+            this.userStore.setUserWallet(address)
+
+            provider.on('disconnect', (code, reason) => {
+                this.userStore.setUserWallet(null)
+                console.log(code, reason)
+                console.log('disconnected')
+            })
+            provider.on('accountsChanged', (accounts) => {
+               if (accounts.length > 0) {
+                   console.log('address', accounts[0])
+               }
+            })
+            provider.on('chainChanged', (chainId) => {
+                console.log('chainChanged', chainId)
+            })
+
+            const name = 'app'
+            if (_.get(this.$router, 'currentRoute.name') != name) {
+                this.$router.push({
+                    name
+                })
+            }
+
+            /*const ghoAddress = '0xcbE9771eD31e761b744D3cB9eF78A1f32DD99211'
+            const contract = new ethers.Contract(
+                ghoAddress,
+                erc20Abi,
+                window.provider
+            )
+            const balance = await contract.balanceOf('0x1C389f1f85Cdb3C2996b83fAc87E496A80698B7C')
+            console.log('balance', balance)*/
+        }
+    },
+    mounted () {
+
+    }
+}
+</script>
+
+<style type="scss" scoped>
+    .app {
+        background: linear-gradient(90deg, hsla(186, 33%, 94%, .95) 0%, hsla(216, 41%, 79%, .95) 100%), url('@/assets/images/51.png');
+        background-repeat: repeat;
+        background-color: white;
+    }
+    .app-bar {
+        background: none !important;
+        box-shadow: none !important;
+    }
+    .logo {
+        width: 129px;
+        margin: 0px 20px 0px 0px;
+    }
+    .connect-btn {
+        margin: 0px 0px 0px 20px;
+    }
+</style>

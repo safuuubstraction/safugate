@@ -10,11 +10,17 @@
     "author": "oOThKOo",
     "license": "MIT",
     "dependencies": {
+        "@walletconnect/web3-provider": "^1.8.0",
         "axios": "^1.4.0",
         "core-js": "^3.8.3",
         "ethers": "^6.3.0",
+        "fs": "^0.0.1-security",
         "lodash": "^4.17.21",
+        "net": "^1.0.2",
+        "node-polyfill-webpack-plugin": "^2.0.1",
         "pinia": "^2.0.4",
+        "tls": "^0.0.1",
+        "viem": "^0.3.24",
         "vue": "^2.7.14",
         "vue-router": "^3.5.1",
         "vuetify": "^2.6.0"
