@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import { BigNumber, ethers } from 'ethers';
 import React, { useCallback, useState } from 'react';
+
+import Config from '../../../../exconfig';
 import {
   AccountImplementations,
   ActiveAccountImplementation,
@@ -38,7 +40,6 @@ import {
 import { EthersTransactionRequest } from '../../../Background/services/types';
 import AccountInfo from '../../components/account-info';
 import OriginInfo from '../../components/origin-info';
-import Config from '../../../../exconfig';
 
 const SignTransactionComponent =
   AccountImplementations[ActiveAccountImplementation].Transaction;
@@ -71,29 +72,20 @@ const SignTransactionConfirmation = ({
   const addPaymaster = useCallback(async () => {
     console.log(paymasterUrl);
     setAddPaymasterLoader(true);
-    if (paymasterUrl) {
-      const paymasterRPC = new ethers.providers.JsonRpcProvider(paymasterUrl, {
-        name: 'Paymaster',
-        chainId: parseInt(activeNetwork.chainID),
-      });
-      try {
-        const paymasterResp = await paymasterRPC.send(
-          'eth_getPaymasterAndDataSize',
-          [userOp]
-        );
-        backgroundDispatch(
-          setUnsignedUserOperation({
-            ...userOp,
-            paymasterAndData: paymasterResp,
-            verificationGasLimit: paymasterResp.verificationGasLimit,
-          })
-        );
-      } catch (e) {
-        console.log(e);
-        setPaymasterError('Paymaster url returned error');
-      }
-      setAddPaymasterLoader(false);
+
+    try {
+      backgroundDispatch(
+        setUnsignedUserOperation({
+          ...userOp,
+          paymasterAndData:
+            '0x7DdEFA2f027691116D0a7aa6418246622d70B12A0100006460133400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fc11182d8c6d414af4600550480bec77e57567c1d2083c63402322ae7c4a720754fa4288a16591316490e66c5dac0e01fcd17c5469d02e1b0f49662bcde96dba1c',
+        })
+      );
+    } catch (e) {
+      console.log(e);
+      setPaymasterError('Paymaster url returned error');
     }
+    setAddPaymasterLoader(false);
   }, [activeNetwork.chainID, backgroundDispatch, paymasterUrl, userOp]);
 
   return (
